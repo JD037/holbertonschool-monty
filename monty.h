@@ -1,6 +1,7 @@
 #ifndef MONTY_H
 #define MONTY_H
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,7 +32,7 @@ typedef struct stack_s
  * @f: function to handle the opcode
  *
  * Description: opcode and its function
- * for stack, queues, LIFO, FIFO Holberton project
+ * for stack, queues, LIFO, FIFO
  */
 typedef struct instruction_s
 {
@@ -39,39 +40,13 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-/* main.c */
-int main(int argc, char **argv);
+/* Function prototypes */
 
-/* opcodes_1.c */
 void push(stack_t **stack, unsigned int line_number);
 void pall(stack_t **stack, unsigned int line_number);
-
-/* opcodes_2.c */
-void pint(stack_t **stack, unsigned int line_number);
-void pop(stack_t **stack, unsigned int line_number);
-void swap(stack_t **stack, unsigned int line_number);
-void add(stack_t **stack, unsigned int line_number);
-void nop(stack_t **stack, unsigned int line_number);
-
-/* opcodes_3.c */
-void sub(stack_t **stack, unsigned int line_number);
-void div_op(stack_t **stack, unsigned int line_number);
-void mul(stack_t **stack, unsigned int line_number);
-void mod(stack_t **stack, unsigned int line_number);
-
-/* opcodes_4.c */
-void pchar(stack_t **stack, unsigned int line_number);
-void pstr(stack_t **stack, unsigned int line_number);
-void rotl(stack_t **stack, unsigned int line_number);
-void rotr(stack_t **stack, unsigned int line_number);
-
-/* opcodes_5.c */
-void stack(stack_t **stack, unsigned int line_number);
-void queue(stack_t **stack, unsigned int line_number);
-
-/* stack_utils.c */
-int is_number(char *s);
 void free_stack(stack_t **stack);
-size_t stack_len(stack_t *stack);
+int is_number(char *str);
+void (*get_opcode_func(char *opcode))(stack_t **, unsigned int);
+stack_t *add_node(stack_t **stack, int n);
 
 #endif /* MONTY_H */
