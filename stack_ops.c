@@ -5,33 +5,25 @@
  * @stack: pointer to the top of the stack
  * @line_number: the line number in the file being executed
  *
- * Return: void
+ * Return: 0 on success, 1 on failure
  */
-void push(stack_t **stack, unsigned int line_number)
+int push(stack_t **stack, unsigned int line_number)
 {
-	char *arg = strtok(NULL, " \n");
+	char *n;
+	int num;
 
-	if (!arg || !is_number(arg))
+	n = strtok(NULL, " \n\t\r");
+	if (n == NULL || !is_number(n))
 	{
 		fprintf(stderr, "L%d: usage: push integer\n", line_number);
-		exit(EXIT_FAILURE);
+		return (1);
 	}
 
-	stack_t *new_node = malloc(sizeof(stack_t));
-	if (!new_node)
-	{
-		fprintf(stderr, "Error: malloc failed\n");
-		exit(EXIT_FAILURE);
-	}
+	num = atoi(n);
+	if (add_node(stack, num) == NULL)
+		return (1);
 
-	new_node->n = atoi(arg);
-	new_node->prev = NULL;
-	new_node->next = *stack;
-
-	if (*stack)
-		(*stack)->prev = new_node;
-
-	*stack = new_node;
+	return (0);
 }
 
 /**
@@ -43,9 +35,11 @@ void push(stack_t **stack, unsigned int line_number)
  */
 void pall(stack_t **stack, unsigned int line_number)
 {
+	stack_t *current;
+
 	(void)line_number;
 
-	stack_t *current = *stack;
+	current = *stack;
 
 	while (current)
 	{

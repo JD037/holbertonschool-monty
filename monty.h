@@ -1,11 +1,13 @@
 #ifndef MONTY_H
 #define MONTY_H
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-/* Data structures */
+#define STACK 0
+#define QUEUE 1
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -23,21 +25,53 @@ typedef struct stack_s
 	struct stack_s *next;
 } stack_t;
 
-/* Function prototypes */
+/**
+ * struct instruction_s - opcode and its function
+ * @opcode: the opcode
+ * @f: function to handle the opcode
+ *
+ * Description: opcode and its function
+ * for stack, queues, LIFO, FIFO Holberton project
+ */
+typedef struct instruction_s
+{
+	char *opcode;
+	void (*f)(stack_t **stack, unsigned int line_number);
+} instruction_t;
 
 /* main.c */
 int main(int argc, char **argv);
 
-/* stack_ops.c */
+/* opcodes_1.c */
 void push(stack_t **stack, unsigned int line_number);
 void pall(stack_t **stack, unsigned int line_number);
 
-/* queue_ops.c */
-void push_queue(stack_t **stack, unsigned int line_number);
-void pall_queue(stack_t **stack, unsigned int line_number);
+/* opcodes_2.c */
+void pint(stack_t **stack, unsigned int line_number);
+void pop(stack_t **stack, unsigned int line_number);
+void swap(stack_t **stack, unsigned int line_number);
+void add(stack_t **stack, unsigned int line_number);
+void nop(stack_t **stack, unsigned int line_number);
 
-/* util.c */
+/* opcodes_3.c */
+void sub(stack_t **stack, unsigned int line_number);
+void div_op(stack_t **stack, unsigned int line_number);
+void mul(stack_t **stack, unsigned int line_number);
+void mod(stack_t **stack, unsigned int line_number);
+
+/* opcodes_4.c */
+void pchar(stack_t **stack, unsigned int line_number);
+void pstr(stack_t **stack, unsigned int line_number);
+void rotl(stack_t **stack, unsigned int line_number);
+void rotr(stack_t **stack, unsigned int line_number);
+
+/* opcodes_5.c */
+void stack(stack_t **stack, unsigned int line_number);
+void queue(stack_t **stack, unsigned int line_number);
+
+/* stack_utils.c */
+int is_number(char *s);
 void free_stack(stack_t **stack);
-int is_number(char *str);
+size_t stack_len(stack_t *stack);
 
 #endif /* MONTY_H */
