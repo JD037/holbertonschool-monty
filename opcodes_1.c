@@ -65,13 +65,12 @@ void pall(stack_t **stack, unsigned int line_number)
 {
 	stack_t *current;
 
-	(void)line_number;
-
-	current = *stack;
+	if (*stack == NULL)
+		return;
 
 	while (current)
 	{
-		printf("%d\n", current->n);
+		printf("%u: %d\n", line_number, current->n);
 		current = current->next;
 	}
 }
