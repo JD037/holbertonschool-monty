@@ -7,66 +7,90 @@
  *
  * Return: EXIT_SUCCESS on success, EXIT_FAILURE on failure
  */
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-	char *line = NULL, *opcode, *data;
-	size_t len = 0;
-	ssize_t read;
-	unsigned int line_number = 0;
-	void (*op_func)(stack_t **, unsigned int) = NULL;
-	stack_t *stack = NULL;
 	FILE *fp;
+	char *buffer = NULL;
+	size_t buffsize = 0;
+	stack_t *stack = NULL;
+	int line_number = 0;
 
 	if (argc != 2)
-	{
-		fprintf(stderr, "USAGE: monty file\n");
-		exit(EXIT_FAILURE);
-	}
+		print_error(1, argv[1], 0, NULL);
 
 	fp = fopen(argv[1], "r");
 	if (fp == NULL)
-	{
-		fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
-		exit(EXIT_FAILURE);
-	}
+		print_error(2, argv[1], 0, NULL);
 
-	while ((read = getline(&line, &len, fp)) != -1)
+	while ((getline(&buffer, &buffsize, fp) != EOF) && (errno == 0))
 	{
 		line_number++;
-		opcode = strtok(line, " \t\n");
-		if (opcode == NULL || opcode[0] == '#')
-			continue;
-
-		op_func = get_opcode_func(opcode);
-		if (op_func == NULL)
+		if (buffer == NULL)
 		{
-			fprintf(stderr, "L%u: unknown instruction %s\n",
-					line_number, opcode);
-			free(line);
-			free_stack(&stack);
-			fclose(fp);
-			exit(EXIT_FAILURE);
+			fprintf(stderr, "Error: malloc failed\n");
+			errno = 12;
 		}
 
-		data = strtok(NULL, " \t\n");
-		if (data != NULL && data[0] != '#')
+		instruction_checker(&buffer, &stack, argv[1], line_number);
+		buffsize = 0;
+	}
+
+	free_stack_t(stack);
+	free(buffer);
+	fclose(fp);
+
+	if (errno != 0)
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+}
+
+/**
+ * instruction_checker - parses lines in file,
+ * and compares to instruction_t array to find function pointer.
+ * @buffer: pointer to buffer storing line from .m file
+ * @stack: pointer to head of stack_t list
+ * @file: name of file being read
+ * @line_number: current line
+ */
+
+void instruction_checker(
+			char **buffer,
+			stack_t **stack,
+			char *file,
+			int line_number
+			)
+
+{
+	char *opcode = NULL;
+	int i;
+	instruction_t commands[] = {
+		{"push", push},		{"pall", pall},
+		{"pop", pop},		{"pint", pint},
+		{"add", add},		{"swap", swap},
+		{"nop", nop},
+		{NULL, NULL}
+
+
+};
+
+	opcode = strtok(*buffer, " \n");
+
+	if (opcode != NULL)
+	{
+		for (i = 0; commands[i].opcode; i++)
 		{
-			if (is_number(data) == 0)
+			if (strcmp(opcode, commands[i].opcode) == 0)
 			{
-				fprintf(stderr, "L%u: usage: push integer\n",
-						line_number);
-				free(line);
-				free_stack(&stack);
-				fclose(fp);
-				exit(EXIT_FAILURE);
+				commands[i].f(&(*stack), line_number);
+				break;
 			}
 		}
 
-		op_func(&stack, line_number);
+		if (commands[i].opcode == NULL)
+		{
+			print_error(3, file, line_number, opcode);
+		}
 	}
-
-	free(line);
-	free_stack(&stack);
-	fclose(fp);
-	exit(EXIT_SUCCESS);
+	free(*buffer);
+	*buffer = NULL;
 }
